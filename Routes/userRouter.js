@@ -64,7 +64,7 @@ router.post(
   }),
   (req, res) => {
     if (req.user.role === "admin") {
-      res.redirect("/admin/dashboard"); // Redirect admins to the admin dashboard
+      res.redirect("/admin/pending"); // Redirect admins to the admin dashboard
     } else {
       res.redirect("/issue/all"); // Redirect citizens to the user dashboard
     }
