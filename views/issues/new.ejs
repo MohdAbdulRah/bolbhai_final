@@ -1,0 +1,188 @@
+<%- include("../includes/boilerplate.ejs") %>
+<style>
+  :root {
+    --bg-main: #0a0b14;
+    --bg-surface-1: #12141f;
+    --bg-surface-2: #1a1d2d;
+    --bg-surface-3: #252a3d;
+    --accent-1: #4d61fc;
+    --accent-2: #00d0ff;
+    --accent-3: #ff3d71;
+    --accent-4: #00e1b4;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a7cc;
+    --text-tertiary: #636b8c;
+    --shadow-md: 0 8px 24px rgba(0,0,0,0.2);
+    --radius-lg: 1.5rem;
+    --radius-full: 100vmax;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+  }
+  body {
+    background: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .issue-container {
+    background: var(--bg-surface-1);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-xl) var(--space-lg);
+    width: 100%;
+    max-width: 400px;
+    margin: var(--space-xl) auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeIn 0.7s;
+  }
+  .logo {
+    font-size: 2rem;
+    font-weight: 800;
+    background: var(--gradient-blue, linear-gradient(135deg, #4d61fc, #00d0ff));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    margin-bottom: var(--space-lg);
+    letter-spacing: -0.03em;
+    text-align: center;
+    width: 100%;
+  }
+  form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+  .form-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    margin-top: 0.25rem;
+  }
+  .form-control {
+    background: var(--bg-surface-2);
+    border: 1px solid var(--bg-surface-3);
+    border-radius: var(--radius-full);
+    color: var(--text-primary);
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    transition: border 0.2s;
+  }
+  .form-control:focus {
+    outline: none;
+    border: 1.5px solid var(--accent-1);
+    box-shadow: 0 0 0 2px rgba(77,97,252,0.15);
+  }
+  .btn {
+    background: var(--gradient-blue, linear-gradient(135deg, #4d61fc, #00d0ff));
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-full);
+    padding: 0.75rem 1.25rem;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    margin-top: var(--space-md);
+  }
+  .btn:hover {
+    box-shadow: 0 0 15px rgba(77,97,252,0.3);
+    transform: translateY(-2px);
+  }
+  @media (max-width: 500px) {
+    .issue-container {
+      padding: var(--space-lg) var(--space-md);
+    }
+    .logo {
+      font-size: 1.5rem;
+    }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(30px);}
+    to { opacity: 1; transform: none;}
+  }
+</style>
+<div class="issue-container">
+  <div class="logo">📢 Report an Issue</div>
+  <form action="/issue/create" method="post" enctype="multipart/form-data">
+    <label for="title" class="form-label">Title <span style="color: var(--accent-3);">*</span></label>
+    <input type="text" class="form-control" id="title" name="title" placeholder="Enter issue title" required>
+
+    <label for="description" class="form-label">Description</label>
+    <textarea class="form-control" id="description" name="description" rows="3" placeholder="Describe the issue" required></textarea>
+
+    <label for="category" class="form-label">Category</label>
+    <select class="form-control" id="category" name="category" required>
+      <option value="">Select category</option>
+      <option value="Garbage">Garbage</option>
+      <option value="Street Light">Street Light</option>
+      <option value="Water Leak">Water Leak</option>
+      <option value="Road">Road</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label for="image" class="form-label">Upload Image</label>
+    <input type="file" class="form-control" id="image" name="image" required>
+
+    <label for="location" class="form-label">Location</label>
+    <input type="text" class="form-control" id="location" name="location" placeholder="Enter location" required>
+
+    <!-- Add a map for location picking -->
+    <div id="map" style="height: 300px; margin-bottom: 1rem;"></div>
+    <input type="hidden" id="latlng" name="latlng">
+
+    <button type="submit" class="btn">Submit Issue</button>
+  </form>
+</div>
+
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  // Initialize map
+  var map = L.map('map').setView([17.385044, 78.486671], 13); // Default: Hyderabad
+
+  // Add OpenStreetMap tiles
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+  }).addTo(map);
+
+  // Marker
+  var marker = L.marker([17.385044, 78.486671], {draggable:true}).addTo(map);
+
+  // Update hidden input when marker moves
+  function updateLatLng(lat, lng) {
+    document.getElementById('latlng').value = lat + ',' + lng;
+  }
+  marker.on('dragend', function(e) {
+    var latlng = marker.getLatLng();
+    updateLatLng(latlng.lat, latlng.lng);
+  });
+
+  // Try to get user's location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(pos) {
+      var lat = pos.coords.latitude;
+      var lng = pos.coords.longitude;
+      map.setView([lat, lng], 15);
+      marker.setLatLng([lat, lng]);
+      updateLatLng(lat, lng);
+    });
+  }
+
+  // Set initial value
+  updateLatLng(marker.getLatLng().lat, marker.getLatLng().lng);
+
+  // Allow user to click map to move marker
+  map.on('click', function(e) {
+    marker.setLatLng(e.latlng);
+    updateLatLng(e.latlng.lat, e.latlng.lng);
+  });
+</script>

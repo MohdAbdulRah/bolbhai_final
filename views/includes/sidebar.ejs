@@ -1,0 +1,81 @@
+<nav class="custom-navbar">
+  <div class="navbar-logo">Issue Tracker</div>
+  <div class="navbar-links">
+    <a href="/issue/all" class="<%= activePage === 'dashboard' ? 'active' : '' %>"><i class="fa fa-home"></i> Home</a>
+    <a href="/issue/new" class="<%= activePage === 'new' ? 'active' : '' %>"><i class="fa fa-plus"></i> Report Issue</a>
+    <a href="/user/profile" class="<%= activePage === 'profile' ? 'active' : '' %>"><i class="fa fa-user"></i> Profile</a>
+    <a href="/user/logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+    <span class="navbar-user"><i class="fa fa-user-circle"></i> <%= currUser ? currUser.username : "Guest" %></span>
+  </div>
+</nav>
+<style>
+.custom-navbar {
+  width: 100%;
+  background: #12141f;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  height: 60px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+.navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #00d0ff;
+}
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-left: auto;
+}
+.navbar-links a {
+  color: #a0a7cc;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 100vmax;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.navbar-links a.active, .navbar-links a:hover {
+  background: #1a1d2d;
+  color: #00d0ff;
+}
+.navbar-user {
+  color: #636b8c;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: 1.5rem;
+}
+@media (max-width: 700px) {
+  .custom-navbar {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 1rem;
+  }
+  .navbar-logo {
+    margin-bottom: 1rem;
+  }
+  .navbar-links {
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+    margin-left: 0;
+  }
+  .navbar-user {
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
+</style>

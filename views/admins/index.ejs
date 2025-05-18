@@ -1,0 +1,299 @@
+<% let pageTitle = "Admin Dashboard"; %>
+<%- include("../includes/adminBoiler.ejs") %>
+<style>
+  .issues-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .issue-card {
+    background: var(--bg-surface-2, #1a1d2d);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s, box-shadow 0.2s;
+    min-height: 420px;
+  }
+  .issue-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 8px 32px rgba(77,97,252,0.15);
+  }
+  .issue-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    background: var(--bg-surface-3, #252a3d);
+  }
+  .issue-content {
+    padding: 1.25rem 1.25rem 1rem 1.25rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .issue-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary, #fff);
+    margin-bottom: 0.25rem;
+  }
+  .status-badge {
+    display: inline-block;
+    padding: 0.3em 1em;
+    border-radius: 100vmax;
+    font-size: 0.95em;
+    font-weight: 600;
+    margin-bottom: 0.5em;
+    background: var(--bg-surface-3, #252a3d);
+    color: var(--text-secondary, #a0a7cc);
+    text-transform: capitalize;
+  }
+  .status-pending { background: #636b8c33; color: #a0a7cc; }
+  .status-in_progress { background: #ffb44333; color: #ffb443; }
+  .status-resolved { background: #00e1b433; color: #00e1b4; }
+  .issue-meta {
+    font-size: 0.98em;
+    color: var(--text-secondary, #a0a7cc);
+    margin-bottom: 0.5em;
+  }
+  .issue-description {
+    color: var(--text-secondary, #a0a7cc);
+    font-size: 1em;
+    margin-bottom: 0.5em;
+    min-height: 48px;
+  }
+  .issue-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid var(--bg-surface-3, #252a3d);
+    background: var(--bg-surface-1, #12141f);
+  }
+  .footer-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+  .upvote-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    color: var(--text-secondary, #a0a7cc);
+    font-weight: 600;
+    font-size: 1em;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+    border-radius: 100vmax;
+    padding: 0.3em 0.8em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .upvote-btn.upvoted {
+    color: #fff;
+    background: var(--accent-3, #ff3d71);
+  }
+  .comment-btn {
+    background: var(--bg-surface-3, #252a3d);
+    color: var(--accent-2, #00d0ff);
+    border: none;
+    border-radius: 100vmax;
+    padding: 0.3em 1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.3em;
+  }
+  .comment-btn:hover {
+    background: var(--accent-2, #00d0ff);
+    color: #fff;
+  }
+  .takeup-btn, .btn-outline-dark {
+    background: var(--accent-1, #4d61fc);
+    color: #fff;
+    border: none;
+    border-radius: 100vmax;
+    padding: 0.3em 1.2em;
+    font-weight: 600;
+    cursor: pointer;
+    margin-left: 0.5em;
+    transition: background 0.2s, color 0.2s;
+  }
+  .takeup-btn:hover, .btn-outline-dark:hover {
+    background: var(--accent-2, #00d0ff);
+    color: #fff;
+  }
+  .comment-sidebar {
+    background: var(--bg-surface-1, #12141f);
+    border: 1px solid var(--bg-surface-3, #252a3d);
+    color: var(--text-primary, #fff);
+    padding: 1rem;
+    z-index: 10;
+    width: 100%;
+    margin-bottom: 1rem;
+    position: static;
+    border-radius: 1rem;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+  @media (min-width: 992px) {
+    .comment-sidebar {
+      position: absolute;
+      left: 105%;
+      top: 0;
+      width: 320px;
+      margin-bottom: 0;
+    }
+  }
+  .comment-list .comment {
+    border-bottom: 1px solid var(--bg-surface-3, #252a3d);
+    padding-bottom: 0.5em;
+    margin-bottom: 0.5em;
+  }
+  .comment-list .comment:last-child {
+    border-bottom: none;
+  }
+  .delete-comment {
+    background: var(--accent-3, #ff3d71);
+    color: #fff;
+    border: none;
+    border-radius: 100vmax;
+    padding: 0.2em 0.8em;
+    font-size: 0.9em;
+    margin-left: 0.5em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .delete-comment:hover {
+    background: #c82333;
+  }
+  .no-comments-msg {
+    color: var(--text-tertiary, #636b8c);
+    font-size: 0.98em;
+    text-align: center;
+    margin-top: 1em;
+  }
+</style>
+
+<div>
+  <%- include('../includes/flash.ejs') %>
+  <div class="issues-grid">
+    <% for(result of results){ %>
+      <div class="issue-card position-relative">
+        <img src="<%= result.image.url %>" alt="Issue Image" />
+        <div class="issue-content">
+          <div class="issue-title"><%= result.title %></div>
+          <div class="status-badge status-<%= result.status %>">
+            <%= result.status.replace('_', ' ') %>
+          </div>
+          <div class="issue-meta">
+            <span>By <%= result.reporter?.username || "Anonymous" %></span>
+            <span> | <%= new Date(result.created_At).toLocaleDateString() %></span>
+          </div>
+          <% if(activePage == "pending"){%>
+            <form action="/admin/takeup/<%= result.id %>" method="post" style="display:inline;">
+              <button class="takeup-btn">Take Up</button>
+            </form>
+          <% } else if(activePage === "in_progress") { %>
+            <div>Assigned To : <%= result.assignedTo.username %></div>
+          <% } else if (activePage === "resolved") { %>
+            <div>Resolved By : <%= result.assignedTo.username %> at <%= new Date(result.resolved_At).toLocaleDateString() %></div>
+          <% }%>
+          <div class="issue-description"><%= result.description || "No description provided." %></div>
+          <div class="issue-meta">
+            📍 <%= result.location || "Location not specified" %> | Category: <%= result.category %>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <div class="footer-actions">
+            <% const userUpvoted = result.upvotes.some(upvoter =>
+              upvoter._id.toString() === currUser._id.toString()); 
+              const upvoteClass = userUpvoted ? 'upvoted' : ''; %>
+            <button class="upvote-btn <%= upvoteClass %>" data-id="<%= result._id %>">
+              👍 <span class="upvote-count"><%= result.upvotes.length %></span>
+            </button>
+            <button class="comment-btn" data-id="<%= result._id %>">
+              💬 <span class="comment-count"><%= result.comments.length %></span>
+            </button>
+          </div>
+        </div>
+        <!-- Sidebar (initially hidden) -->
+        <div id="sidebar-<%= result._id %>" class="comment-sidebar" style="display: none;">
+          <h5>Add Comment</h5>
+          <form action="/comment/<%= result._id %>" method="POST" class="d-flex align-items-center gap-2 mt-2">
+            <textarea name="content" placeholder="Add a comment..." class="form-control" style="resize: none; height: 36px" required></textarea>
+            <button type="submit" class="btn btn-link p-0 text-primary" style="text-decoration: none">Post</button>
+          </form>
+          <button class="btn btn-sm btn-danger mt-2 close-sidebar">Close</button>
+          <!-- Show Comments -->
+          <div class="comment-list">
+            <% if (result.comments && result.comments.length > 0) { %>
+              <% result.comments.forEach(comment => { %>
+                <div class="comment mb-2 p-2">
+                  <strong><%= comment.username || 'Anonymous' %></strong>
+                  <% if(currUser.username === comment.username) { %>
+                    <button type="button" class="delete-comment" data-issueid="<%= result._id %>" data-commentid="<%= comment._id %>" onclick="return confirm('Are you sure?')">Delete</button>
+                  <% } %>
+                  <br />
+                  <small><%= comment.content %></small>
+                </div>
+              <% }) %>
+            <% } else { %>
+              <div class="no-comments-msg">No comments yet.</div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll(".comment-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const target = document.getElementById(`sidebar-${id}`);
+      // Hide all other sidebars
+      document.querySelectorAll(".comment-sidebar").forEach((sb) => {
+        if (sb !== target) sb.style.display = "none";
+      });
+      // Toggle display of current sidebar
+      target.style.display = target.style.display === "block" ? "none" : "block";
+    });
+  });
+  document.querySelectorAll(".close-sidebar").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      btn.closest(".comment-sidebar").style.display = "none";
+    });
+  });
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".upvote-btn").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const issueId = button.getAttribute("data-id");
+        try {
+          const response = await fetch(`/issue/${issueId}/upvote`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          });
+          const data = await response.json();
+          // Update button UI
+          const upvoteCountSpan = button.querySelector(".upvote-count");
+          upvoteCountSpan.textContent = data.upvotes;
+          if (data.upvoted) {
+            button.classList.add("upvoted");
+          } else {
+            button.classList.remove("upvoted");
+          }
+        } catch (err) {
+          console.error("Upvote toggle failed", err);
+        }
+      });
+    });
+  });
+</script>
+<script src="/js/comments.js"></script>
+

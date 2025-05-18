@@ -1,0 +1,81 @@
+<%- include("../includes/boilerplate.ejs") %>
+
+
+<div class="container" style="margin-top: 80px;">
+    <div class="form-container">
+      <h2>✏️ Edit Issue</h2>
+      <form action="/issue/update/<%= result.id %>?_method=PATCH" method="post" novalidate class="needs-validation" enctype="multipart/form-data">
+        <!-- Title -->
+        <div class="mb-3">
+          <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" id="title" name="title" required value="<%= result.title %>">
+          <div class="valid-feedback">
+            Title looks good!
+          </div>
+        <div class="invalid-feedback">
+            Please enter a title
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea class="form-control" id="description" name="description" rows="3" required><%= result.description %></textarea>
+          <div class="invalid-feedback">
+            Please add a description
+          </div>
+        </div>
+
+        <!-- Category -->
+        <div class="mb-3">
+          <label for="category" class="form-label">Category</label>
+          <select class="form-select" id="category" name="category" required>
+            <option value="">Select category</option>
+            <option value="Garbage" <%= result.category === "Garbage" ? "selected" : "" %>>Garbage</option>
+            <option value="Street Light" <%= result.category === "Street Light" ? "selected" : "" %>>Street Light</option>
+            <option value="Water Leak" <%= result.category === "Water Leak" ? "selected" : "" %>>Water Leak</option>
+            <option value="Road" <%= result.category === "Road" ? "selected" : "" %>>Road</option>
+            <option value="Other" <%= result.category === "Other" ? "selected" : "" %>>Other</option>
+          </select>
+          <div class="invalid-feedback">
+            Please select a category
+          </div>
+        </div>
+
+        <!-- Image -->
+        <div class="mb-3">
+          <label for="image" class="form-label">Upload New Image</label>
+          <input type="file" class="form-control" id="image" name="image" >
+        </div>
+
+        <!-- Location -->
+        <div class="mb-3">
+          <label for="location" class="form-label">Location</label>
+          <input type="text" class="form-control" id="location" name="location" required value="<%= result.location %>">
+          <div class="invalid-feedback">
+            Please enter a location
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button type="submit" class="btn btn-primary w-20">Update Issue</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Bootstrap form validation
+    (() => {
+      'use strict';
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
+    })()
+  </script>

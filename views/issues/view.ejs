@@ -1,0 +1,54 @@
+<% if(currUser.role == "admin") { %>
+    <%- include("../includes/adminBoiler.ejs") %>
+<% } else { %>
+    <%- include("../includes/boilerplate.ejs") %>
+<% } %>
+
+<div class="page-container">
+  <%- include('../includes/flash.ejs') %>
+  <div class="issue-wrapper">
+    <div class="card">
+      <h4 class="title"><%= issue.title %></h4>
+      <img src="<%= issue.image.url %>" alt="Issue Image" class="card-img-top">
+      <div class="card-body">
+        <div class="username">Reported by: <%= issue.reporter?.username || "Anonymous" %></div>
+        <div class="status-badge status-<%= issue.status %>"><%= issue.status.replace('_', ' ') %></div>
+        <div class="description"><%= issue.description || "No description provided." %></div>
+        <div class="location">📍 <%= issue.location || "Location not specified" %></div>
+        <div class="category">Category: <%= issue.category %></div>
+      </div>
+    </div>
+
+    <!-- Map Section -->
+    <!-- <% if(issue.lat && issue.lng) { %>
+      <div id="view-map" style="height: 300px; border-radius: 1rem; margin-bottom: 1rem;"></div>
+      <script>
+        var map = L.map('view-map').setView([<%= issue.lat %>, <%= issue.lng %>], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {maxZoom: 19}).addTo(map);
+        L.marker([<%= issue.lat %>, <%= issue.lng %>]).addTo(map);
+      </script>
+    <% } %> -->
+
+    <!-- Comments -->
+    <div class="comments-section">
+      <h5>Comments (<%= issue.comments.length %>)</h5>
+      <form action="/comment/<%= issue._id %>" method="POST">
+        <textarea name="content" placeholder="Add a comment..." class="form-control" required></textarea>
+        <button type="submit" class="btn btn-primary mt-2">Post Comment</button>
+      </form>
+      <div class="comments-list">
+        <% if (issue.comments.length > 0) { %>
+          <% issue.comments.forEach(comment => { %>
+            <div class="comment">
+              <strong><%= comment.username || "Anonymous" %></strong>: <%= comment.content %>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="no-comments">No comments yet.</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+
+

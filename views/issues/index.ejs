@@ -1,0 +1,1086 @@
+<%- include("../includes/boilerplate.ejs") %>
+
+<style>
+  /* Reset and base styles */
+  *, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    /* Color system */
+    --bg-main: #0a0b14;
+    --bg-surface-1: #12141f;
+    --bg-surface-2: #1a1d2d;
+    --bg-surface-3: #252a3d;
+    --accent-1: #4d61fc;
+    --accent-2: #00d0ff;
+    --accent-3: #ff3d71;
+    --accent-4: #00e1b4;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a7cc;
+    --text-tertiary: #636b8c;
+    
+    /* Status colors */
+    --status-open: #00d0ff;
+    --status-progress: #ffb443;
+    --status-resolved: #00e1b4;
+    
+    /* Shadows and effects */
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.25);
+    --glow-blue: 0 0 20px rgba(77, 97, 252, 0.4);
+    --glow-cyan: 0 0 20px rgba(0, 208, 255, 0.4);
+    --glow-green: 0 0 20px rgba(0, 225, 180, 0.4);
+    
+    /* Gradients */
+    --gradient-blue: linear-gradient(135deg, #4d61fc, #00d0ff);
+    --gradient-purple: linear-gradient(135deg, #7d4dfc, #ff3d71);
+    --gradient-green: linear-gradient(135deg, #00d0ff, #00e1b4);
+    
+    /* Spacing */
+    --space-xs: 0.25rem;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-2xl: 3rem;
+    
+    /* Border radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.5rem;
+    --radius-full: 100vmax;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.5;
+  }
+
+  /* Main layout */
+  .dashboard {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background-color: var(--bg-surface-1);
+    padding: var(--space-lg);
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-header {
+    margin-bottom: var(--space-xl);
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    background: var(--gradient-blue);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    letter-spacing: -0.03em;
+  }
+
+  .nav-section {
+    margin-bottom: var(--space-xl);
+  }
+
+  .nav-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-tertiary);
+    margin-bottom: var(--space-md);
+  }
+
+  .nav-list {
+    list-style: none;
+  }
+
+  .nav-item {
+    margin-bottom: var(--space-sm);
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .nav-link:hover, .nav-link.active {
+    background-color: var(--bg-surface-2);
+    color: var(--text-primary);
+  }
+
+  .nav-link.active {
+    background: rgba(77, 97, 252, 0.1);
+    color: var(--accent-1);
+  }
+
+  .nav-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .user-profile {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-md);
+    background-color: var(--bg-surface-2);
+    border-radius: var(--radius-md);
+  }
+
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--gradient-blue);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: white;
+  }
+
+  .user-info {
+    flex: 1;
+  }
+
+  .user-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  .user-role {
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+  }
+
+  /* Main content */
+  .main-content {
+    padding: var(--space-lg);
+    overflow-y: auto;
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-xl);
+  }
+
+  .page-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--space-md);
+  }
+
+  .search-bar {
+    position: relative;
+    width: 300px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    padding-left: 2.5rem;
+    background-color: var(--bg-surface-1);
+    border: 1px solid var(--bg-surface-3);
+    border-radius: var(--radius-full);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(77, 97, 252, 0.2);
+  }
+
+  .search-icon {
+    position: absolute;
+    left: var(--space-md);
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-tertiary);
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Grid layout for issues */
+  .issues-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: var(--space-lg);
+  }
+
+  /* Issue card */
+  .issue-card {
+    position: relative;
+    background-color: var(--bg-surface-1);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .issue-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .issue-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--gradient-blue);
+    z-index: 1;
+  }
+
+  .issue-card.status-in_progress::before {
+    background: linear-gradient(90deg, var(--status-progress), #ffda83);
+  }
+
+  .issue-card.status-resolved::before {
+    background: linear-gradient(90deg, #00e1b4, #7df9e1);
+  }
+
+  .card-image-container {
+    position: relative;
+    height: 180px;
+    overflow: hidden;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .issue-card:hover .card-image {
+    transform: scale(1.05);
+  }
+
+  .card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(10, 11, 20, 0) 0%, rgba(10, 11, 20, 0.8) 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: var(--space-md);
+  }
+
+  .card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+    color: var(--text-primary);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  }
+
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+  }
+
+  .card-content {
+    padding: var(--space-lg);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: var(--space-md);
+  }
+
+  .status-badge::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    margin-right: var(--space-sm);
+  }
+
+  .status-open {
+    background-color: rgba(0, 208, 255, 0.1);
+    color: var(--status-open);
+  }
+
+  .status-open::before {
+    background-color: var(--status-open);
+    box-shadow: 0 0 5px var(--status-open);
+  }
+
+  .status-in_progress {
+    background-color: rgba(255, 180, 67, 0.1);
+    color: var(--status-progress);
+  }
+
+  .status-in_progress::before {
+    background-color: var(--status-progress);
+    box-shadow: 0 0 5px var(--status-progress);
+  }
+
+  .status-resolved {
+    background-color: rgba(0, 225, 180, 0.1);
+    color: var(--status-resolved);
+  }
+
+  .status-resolved::before {
+    background-color: var(--status-resolved);
+    box-shadow: 0 0 5px var(--status-resolved);
+  }
+
+  .card-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-lg);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: var(--space-sm);
+  }
+
+  .card-stats {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+  }
+
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    color: var(--text-tertiary);
+    font-size: 0.85rem;
+  }
+
+  .stat-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+  }
+
+  .btn-primary {
+    background: var(--gradient-blue);
+    color: white;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-primary:hover {
+    box-shadow: var(--glow-blue);
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background-color: var(--bg-surface-2);
+    color: var(--text-secondary);
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--bg-surface-3);
+    color: var(--text-primary);
+  }
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border-radius: var(--radius-full);
+    background-color: var(--bg-surface-2);
+    color: var(--text-secondary);
+  }
+
+  .btn-icon:hover {
+    background-color: var(--bg-surface-3);
+    color: var(--text-primary);
+  }
+
+  .btn-sm {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.8rem;
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, var(--accent-3), #ff6b9d);
+    color: white;
+  }
+
+  .btn-danger:hover {
+    box-shadow: 0 0 15px rgba(255, 61, 113, 0.4);
+    transform: translateY(-2px);
+  }
+
+  /* Upvote button */
+  .upvote-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-full);
+    background-color: var(--bg-surface-2);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .upvote-btn:hover {
+    background-color: rgba(77, 97, 252, 0.1);
+    color: var(--accent-1);
+  }
+
+  .upvote-btn.upvoted {
+    background: var(--gradient-blue);
+    color: white;
+    box-shadow: var(--glow-blue);
+  }
+
+  /* Modal for comments */
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(10, 11, 20, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-container {
+    background-color: var(--bg-surface-1);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+  }
+
+  .modal-overlay.active .modal-container {
+    transform: translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border-bottom: 1px solid var(--bg-surface-3);
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .modal-close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+  }
+
+  .modal-close:hover {
+    background-color: var(--bg-surface-2);
+    color: var(--text-primary);
+  }
+
+  .modal-body {
+    padding: var(--space-lg);
+  }
+
+  .comment-form {
+    margin-bottom: var(--space-lg);
+  }
+
+  .comment-input {
+    width: 100%;
+    padding: var(--space-md);
+    background-color: var(--bg-surface-2);
+    border: 1px solid var(--bg-surface-3);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    resize: none;
+    min-height: 100px;
+    margin-bottom: var(--space-md);
+    transition: all 0.2s ease;
+  }
+
+  .comment-input:focus {
+    outline: none;
+    border-color: var(--accent-1);
+    box-shadow: 0 0 0 3px rgba(77, 97, 252, 0.2);
+  }
+
+  .comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+  }
+
+  .comment-item {
+    background-color: var(--bg-surface-2);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+  }
+
+  .comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+  }
+
+  .comment-author {
+    font-weight: 600;
+    color: var(--accent-2);
+  }
+
+  .comment-content {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+  }
+
+  .delete-comment {
+    background: none;
+    border: none;
+    color: var(--accent-3);
+    cursor: pointer;
+    font-size: 0.8rem;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .delete-comment:hover {
+    opacity: 1;
+  }
+
+  .no-comments {
+    text-align: center;
+    padding: var(--space-xl) 0;
+    color: var(--text-tertiary);
+    font-style: italic;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 1024px) {
+    .dashboard {
+      grid-template-columns: 220px 1fr;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .dashboard {
+      grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+      display: none;
+    }
+
+    .issues-grid {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .animate-fade {
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .animate-slide {
+    animation: slideUp 0.5s ease forwards;
+  }
+
+  /* Staggered animation for grid items */
+  .issues-grid > div {
+    opacity: 0;
+  }
+
+  .issues-grid > div:nth-child(1) { animation: slideUp 0.5s ease forwards 0.1s; }
+  .issues-grid > div:nth-child(2) { animation: slideUp 0.5s ease forwards 0.2s; }
+  .issues-grid > div:nth-child(3) { animation: slideUp 0.5s ease forwards 0.3s; }
+  .issues-grid > div:nth-child(4) { animation: slideUp 0.5s ease forwards 0.4s; }
+  .issues-grid > div:nth-child(5) { animation: slideUp 0.5s ease forwards 0.5s; }
+  .issues-grid > div:nth-child(6) { animation: slideUp 0.5s ease forwards 0.6s; }
+  .issues-grid > div:nth-child(n+7) { animation: slideUp 0.5s ease forwards 0.7s; }
+</style>
+
+<div class="dashboard">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    
+    
+    <nav class="nav-section">
+      <h3 class="nav-title">Main</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="#" class="nav-link active">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
+              <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            Dashboard
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 5v14M5 12h14"></path>
+            </svg>
+            New Issue
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"></path>
+            </svg>
+            Saved
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <nav class="nav-section">
+      <h3 class="nav-title">Categories</h3>
+      <ul class="nav-list">
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2V3z"></path>
+              <path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7V3z"></path>
+            </svg>
+            Infrastructure
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="3" y1="9" x2="21" y2="9"></line>
+              <line x1="9" y1="21" x2="9" y2="9"></line>
+            </svg>
+            Roads
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8h1a4 4 0 010 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            Sanitation
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Safety
+          </a>
+        </li>
+      </ul>
+    </nav>
+    
+    <div class="user-profile">
+      <div class="user-avatar">
+        <%= currUser.username ? currUser.username.charAt(0).toUpperCase() : 'U' %>
+      </div>
+      <div class="user-info">
+        <div class="user-name"><%= currUser.username %></div>
+        <div class="user-role">Community Member</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <header class="header">
+      <h1 class="page-title">Community Issues</h1>
+      
+      <div class="header-actions">
+        <div class="search-bar">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" class="search-input" placeholder="Search issues...">
+        </div>
+        
+        <button class="btn btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          Report Issue
+        </button>
+      </div>
+    </header>
+
+    <%- include('../includes/flash.ejs') %>
+    
+    <!-- Filter form -->
+    <form class="d-flex mb-4" method="GET" action="/issue/all">
+      <input class="form-control me-2" type="search" name="q" placeholder="Search issues..." value="<%= typeof q !== 'undefined' ? q : '' %>">
+      <select class="form-select me-2" name="status">
+        <option value="">All Statuses</option>
+        <option value="pending">Pending</option>
+        <option value="in progress">In Progress</option>
+        <option value="resolved">Resolved</option>
+      </select>
+      <select class="form-select me-2" name="category">
+        <option value="">All Categories</option>
+        <option value="Garbage">Garbage</option>
+        <option value="Street Light">Street Light</option>
+        <option value="Water Leak">Water Leak</option>
+        <option value="Road">Road</option>
+        <option value="Other">Other</option>
+      </select>
+      <button class="btn btn-primary" type="submit">Filter</button>
+    </form>
+    
+    <div class="issues-grid">
+      <% for(result of results){ %>
+        <div class="issue-card status-<%= result.status %>">
+          <div class="card-image-container">
+            <img src="<%= result.image.url %>" alt="<%= result.title %>" class="card-image">
+            <div class="card-overlay">
+              <h3 class="card-title"><%= result.title %></h3>
+              <div class="card-meta">
+                <span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <polyline points="12 6 12 12 16 14"></polyline>
+                  </svg>
+                  <%= new Date(result.created_At).toLocaleDateString() %>
+                </span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card-content">
+            <div class="status-badge status-<%= result.status %>">
+              <%= result.status.replace('_', ' ') %>
+            </div>
+            
+            <% if(result.status === "in_progress"){ %>
+              <div class="assigned-info" style="margin-bottom: var(--space-md); font-size: 0.85rem; color: var(--text-secondary);">
+                Assigned to <span style="color: var(--accent-2); font-weight: 500;"><%= result.assignedTo.username %></span>
+              </div>
+            <% } else if(result.status === "resolved"){ %>
+              <div class="resolved-info" style="margin-bottom: var(--space-md); font-size: 0.85rem; color: var(--text-secondary);">
+                Resolved by <span style="color: var(--accent-2); font-weight: 500;"><%= result.assignedTo.username %></span>
+                on <%= new Date(result.resolved_At).toLocaleDateString() %>
+              </div>
+            <% } %>
+            
+            <p class="card-description"><%= result.description || "No description provided." %></p>
+            
+            <div class="card-footer">
+              <div class="card-stats">
+                <% const userUpvoted = result.upvotes.some(upvoter => upvoter._id.toString() === currUser._id.toString());
+                   const upvoteClass = userUpvoted ? 'upvoted' : ''; %>
+                
+                <button class="upvote-btn <%= upvoteClass %>" data-id="<%= result._id %>">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="upvote-icon">
+                    <path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14z"></path>
+                    <path d="M7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"></path>
+                  </svg>
+                  <span class="upvote-count"><%= result.upvotes.length %></span>
+                </button>
+                
+                <div class="stat-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+                    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"></path>
+                  </svg>
+                  <span><%= result.comments.length %></span>
+                </div>
+                
+                <div class="stat-item">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="stat-icon">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  </svg>
+                  <span><%= result.location || "Unknown" %></span>
+                </div>
+              </div>
+              
+              <div class="card-actions">
+                <button class="btn btn-secondary btn-sm comment-btn" data-id="<%= result._id %>">
+                  Comments
+                </button>
+                
+                <% if(currUser.id.toString() === result.reporter.id.toString()){ %>
+                  <div class="dropdown">
+                    <button class="btn btn-icon btn-sm">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="1"></circle>
+                        <circle cx="12" cy="5" r="1"></circle>
+                        <circle cx="12" cy="19" r="1"></circle>
+                      </svg>
+                    </button>
+                    <div class="dropdown-menu" style="display: none; position: absolute; right: 0; top: 100%; background: var(--bg-surface-2); border-radius: var(--radius-md); box-shadow: var(--shadow-md); min-width: 150px; z-index: 10; margin-top: var(--space-xs);">
+                      <a href="/issue/edit/<%= result._id %>" class="dropdown-item" style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); color: var(--text-secondary); text-decoration: none;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"></path>
+                          <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Edit
+                      </a>
+                      <form action="/issue/<%= result._id %>?_method=DELETE" method="POST" style="margin: 0;">
+                        <button type="submit" class="dropdown-item" style="width: 100%; text-align: left; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm) var(--space-md); color: var(--accent-3);">
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"></path>
+                          </svg>
+                          Delete
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </main>
+</div>
+
+<!-- Modal for comments -->
+<% for(result of results){ %>
+<div id="comments-modal-<%= result._id %>" class="modal-overlay">
+  <div class="modal-container">
+    <div class="modal-header">
+      <h3 class="modal-title">Comments (<%= result.comments.length %>)</h3>
+      <button class="modal-close" data-id="<%= result._id %>">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <form action="/comment/<%= result._id %>" method="POST" class="comment-form">
+        <textarea name="content" placeholder="Share your thoughts..." class="comment-input" required></textarea>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+      </form>
+      
+      <div class="comments-list">
+        <% if (result.comments && result.comments.length > 0) { %>
+          <% result.comments.forEach(comment => { %>
+            <div class="comment-item">
+              <div class="comment-header">
+                <div class="comment-author"><%= comment.username || 'Anonymous' %></div>
+                <% if(currUser.username === comment.username) { %>
+                  <button type="button" class="delete-comment" 
+                          data-issueid="<%= result._id %>" 
+                          data-commentid="<%= comment._id %>"
+                          onclick="return confirm('Are you sure you want to delete this comment?')">
+                    Delete
+                  </button>
+                <% } %>
+              </div>
+              <div class="comment-content"><%= comment.content %></div>
+            </div>
+          <% }) %>
+        <% } else { %>
+          <div class="no-comments">No comments yet. Be the first to share your thoughts!</div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<script>
+  // Toggle dropdown menu
+  document.querySelectorAll('.dropdown').forEach(dropdown => {
+    const btn = dropdown.querySelector('.btn-icon');
+    const menu = dropdown.querySelector('.dropdown-menu');
+    
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    document.addEventListener('click', () => {
+      menu.style.display = 'none';
+    });
+  });
+
+  // Comments modal
+  document.querySelectorAll(".comment-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const modal = document.getElementById(`comments-modal-${id}`);
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+  
+  document.querySelectorAll(".modal-close").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-id");
+      const modal = document.getElementById(`comments-modal-${id}`);
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    });
+  });
+  
+  document.querySelectorAll(".modal-overlay").forEach((modal) => {
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+  
+  // Upvote functionality
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".upvote-btn").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const issueId = button.getAttribute("data-id");
+        
+        try {
+          const response = await fetch(`/issue/${issueId}/upvote`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+          
+          const data = await response.json();
+          
+          // Update button UI
+          const upvoteCountSpan = button.querySelector(".upvote-count");
+          upvoteCountSpan.textContent = data.upvotes;
+          
+          if (data.upvoted) {
+            button.classList.add("upvoted");
+          } else {
+            button.classList.remove("upvoted");
+          }
+        } catch (err) {
+          console.error("Upvote toggle failed", err);
+        }
+      });
+    });
+  });
+</script>
+<script src="/js/comments.js"></script>
