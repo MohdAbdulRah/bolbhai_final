@@ -45,7 +45,7 @@ router.post("/signup", async (req, res, next) => {
       if (result.role === "citizen") {
         res.redirect("/issue/all"); // Redirect citizens to the user dashboard
       } else {
-        res.redirect("/admin/dashboard"); // Redirect admins to the admin dashboard
+        res.redirect("/admin/pending"); // Redirect admins to the admin dashboard
       }
     });
   } catch (err) {
